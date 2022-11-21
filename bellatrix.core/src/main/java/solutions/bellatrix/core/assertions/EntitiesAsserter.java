@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EntitiesAsserter {
     public static <TEntity> Boolean areEqual(TEntity expectedObject, TEntity realObject, DateTimeDeltaType deltaType, int deltaQuantity, String... propertiesNotToCompare) {
@@ -50,9 +51,9 @@ public class EntitiesAsserter {
 
     private static <TEntity> List<Exception> assertAreEqualsInternal(TEntity expectedObject, TEntity realObject, DateTimeDeltaType deltaType, int deltaQuantity, String[] propertiesNotToCompare) {
         List<Exception> failedAssertions = new ArrayList<>();
-        List<String> propertiesNotToCompareList = Arrays.stream(propertiesNotToCompare).toList();
-        var properties = Arrays.stream(realObject.getClass().getMethods()).toList()
-                .stream().filter(s -> s.getName().startsWith("get")).toList();
+        List<String> propertiesNotToCompareList = Arrays.stream(propertiesNotToCompare).collect(Collectors.toList());
+        var properties = Arrays.stream(realObject.getClass().getMethods()).collect(Collectors.toList())
+                .stream().filter(s -> s.getName().startsWith("get")).collect(Collectors.toList());
 
         for (var currentRealProperty : properties) {
             String currentRealPropertyName = currentRealProperty.getName().replaceFirst("get", "");
