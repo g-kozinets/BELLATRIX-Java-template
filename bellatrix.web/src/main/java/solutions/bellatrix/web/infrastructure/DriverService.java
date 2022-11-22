@@ -161,7 +161,7 @@ public class DriverService {
                 .setFtpProxy(proxyUrl);
 
         switch (BROWSER_CONFIGURATION.get().getBrowser()) {
-            case CHROME -> {
+            case CHROME: {
                 WebDriverManager.chromedriver().setup();
                 var chromeOptions = new ChromeOptions();
                 addDriverOptions(chromeOptions);
@@ -172,7 +172,8 @@ public class DriverService {
 
                 driver = new ChromeDriver(chromeOptions);
             }
-            case CHROME_HEADLESS -> {
+            break;
+            case CHROME_HEADLESS: {
                 WebDriverManager.chromedriver().setup();
                 var chromeHeadlessOptions = new ChromeOptions();
                 addDriverOptions(chromeHeadlessOptions);
@@ -184,57 +185,22 @@ public class DriverService {
 
                 driver = new ChromeDriver(chromeHeadlessOptions);
             }
-            case FIREFOX -> {
-                WebDriverManager.firefoxdriver().setup();
-                var firefoxOptions = new FirefoxOptions();
-                addDriverOptions(firefoxOptions);
-                firefoxOptions.setAcceptInsecureCerts(true);
-                if (shouldCaptureHttpTraffic) firefoxOptions.setProxy(proxyConfig);
-                driver = new FirefoxDriver(firefoxOptions);
-            }
-            case FIREFOX_HEADLESS -> {
-                WebDriverManager.firefoxdriver().setup();
-                var firefoxHeadlessOptions = new FirefoxOptions();
-                addDriverOptions(firefoxHeadlessOptions);
-                firefoxHeadlessOptions.setAcceptInsecureCerts(true);
-                firefoxHeadlessOptions.setHeadless(true);
-                if (shouldCaptureHttpTraffic) firefoxHeadlessOptions.setProxy(proxyConfig);
-                driver = new FirefoxDriver(firefoxHeadlessOptions);
-            }
-            case EDGE -> {
-
-                WebDriverManager.edgedriver().setup();
-                var edgeOptions = new EdgeOptions();
-                addDriverOptions(edgeOptions);
-                if (shouldCaptureHttpTraffic) edgeOptions.setProxy(proxyConfig);
-                driver = new EdgeDriver(edgeOptions);
-            }
-            // case EDGE_HEADLESS
-            case OPERA -> {
-                WebDriverManager.operadriver().setup();
-                var operaOptions = new OperaOptions();
-                addDriverOptions(operaOptions);
-                if (shouldCaptureHttpTraffic) operaOptions.setProxy(proxyConfig);
-                driver = new OperaDriver(operaOptions);
-            }
-            case SAFARI -> {
-                System.setProperty("webdriver.safari.driver", "/usr/bin/safaridriver");
-                var safariOptions = new SafariOptions();
-                addDriverOptions(safariOptions);
-                if (shouldCaptureHttpTraffic) safariOptions.setProxy(proxyConfig);
-                driver = new SafariDriver(safariOptions);
-            }
-            case INTERNET_EXPLORER -> {
-                WebDriverManager.iedriver().setup();
-                var internetExplorerOptions = new InternetExplorerOptions();
-                addDriverOptions(internetExplorerOptions);
-                internetExplorerOptions.introduceFlakinessByIgnoringSecurityDomains().ignoreZoomSettings();
-                if (shouldCaptureHttpTraffic) internetExplorerOptions.setProxy(proxyConfig);
-                driver = new InternetExplorerDriver(internetExplorerOptions);
-            }
+            break;
         }
 
         return driver;
+    }
+
+    private static void caseChrome(boolean shouldCaptureHttpTraffic, Proxy proxyConfig, WebDriver driver) {
+        WebDriverManager.chromedriver().setup();
+        var chromeOptions = new ChromeOptions();
+        addDriverOptions(chromeOptions);
+        chromeOptions.addArguments("--log-level=3");
+        chromeOptions.setAcceptInsecureCerts(true);
+        System.setProperty("webdriver.chrome.silentOutput", "true");
+        if (shouldCaptureHttpTraffic) chromeOptions.setProxy(proxyConfig);
+
+        driver = new ChromeDriver(chromeOptions);
     }
 
     private static <TOption extends MutableCapabilities> void addGridOptions(TOption options, GridSettings gridSettings) {
